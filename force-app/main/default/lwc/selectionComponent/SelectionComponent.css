@@ -1,0 +1,31 @@
+.grid-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.grid-item {
+  width: 150px;
+  text-align: center;
+  padding: 1rem;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.grid-item.selected {
+  border-color: #0176d3;
+  background-color: #e6f4ff;
+}
+
+.grid-item:hover {
+  border-color: #0176d3;
+}
+
+.label {
+  margin-top: 0.5rem;
+  font-weight: bold;
+  font-size: 0.85rem;
+}

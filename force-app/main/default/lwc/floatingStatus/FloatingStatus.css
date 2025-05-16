@@ -1,0 +1,67 @@
+.floating-status {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    font-weight: bold;
+    font-size: 1.2rem;
+    height: 45px;
+    line-height: 45px;
+    text-align: center;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    animation: smoothFloat 3s ease-in-out infinite;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s, border-radius 0.3s;
+    border: 2px solid transparent; /* Default border */
+}
+
+/* Enhanced Floating Animation (Smooth Vertical Motion) */
+@keyframes smoothFloat {
+    0% {
+        transform: translate(-50%, 0);
+    }
+    25% {
+        transform: translate(-50%, -5px);
+    }
+    50% {
+        transform: translate(-50%, 10px);
+    }
+    75% {
+        transform: translate(-50%, -5px);
+    }
+    100% {
+        transform: translate(-50%, 0);
+    }
+}
+
+/* Status-specific styles */
+
+/* Pending: Grey background with blue border */
+.pending {
+    background-color: #6c757d;
+    border-color: #007bff; /* Blue border */
+    border-radius: 12px; /* Slightly rounded */
+}
+
+/* Connected: Green background with green border */
+.connected {
+    background-color: #28a745;
+    border-color: #218838; /* Darker green border */
+    border-radius: 20px; /* More rounded */
+}
+
+/* Failed: Red background with dark red border */
+.failed {
+    background-color: #dc3545;
+    border-color: #bd2130; /* Darker red border */
+    border-radius: 8px; /* Minimal rounding */
+}
+
+/* Draft: Yellow background with black border */
+.draft {
+    background-color: #ffc107;
+    color: black;
+    border-color: #000000; /* Black border */
+    border-radius: 15px; /* Medium rounded */
+}

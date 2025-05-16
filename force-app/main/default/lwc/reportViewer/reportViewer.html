@@ -1,0 +1,18 @@
+<template>
+  <lightning-card title="Total Amount Summary" icon-name="utility:analytics">
+    <div class="slds-p-around_medium">
+      <template if:true={isLoading}>
+        <lightning-spinner alternative-text="Loading data..."></lightning-spinner>
+      </template>
+
+      <template if:true={error}>
+        <div class="slds-text-color_error">{error}</div>
+      </template>
+
+      <template if:true={data.length}>
+        <p><strong>Sum of Total Amount:</strong> {totalSum}</p>
+        <p><strong>Average of Total Amount:</strong> {averageAmount}</p>
+      </template>
+    </div>
+  </lightning-card>
+</template>

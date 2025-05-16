@@ -1,0 +1,15 @@
+<template>
+  <div class="grid-container">
+    <template for:each={options} for:item="option">
+      <div
+        key={option.name}
+        class={option.className}
+        onclick={handleOptionSelect}
+        data-name={option.name}
+      >
+        <span class="material-icons">{option.icon}</span>
+        <div class="label">{option.name}</div>
+      </div>
+    </template>
+  </div>
+</template>

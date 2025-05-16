@@ -1,0 +1,56 @@
+<template>
+    <lightning-card title="External Data Viewer" icon-name="utility:connected_apps">
+        <div class="slds-m-around_medium">
+            <div class="slds-grid slds-grid_align-spread">
+                <lightning-button-icon icon-name="utility:settings" 
+                                       alternative-text="Settings"
+                                       onclick={toggleSettings}
+                                       class="settings-icon">
+                </lightning-button-icon>
+            </div>
+        </div>
+
+        <template if:true={showSettings}>
+            <template for:each={configsData} for:item="cfg">
+                <section key={cfg.configId} class="slds-m-around_medium settings-section">
+                    <h3>{cfg.configName} - Column Settings</h3>
+                    <template for:each={cfg.availableColumns} for:item="col">
+                        <lightning-input 
+                            type="checkbox" 
+                            key={col.fieldName} 
+                            label={col.label} 
+                            checked={col.visible} 
+                            data-configid={cfg.configId}
+                            data-field={col.fieldName}
+                            onchange={toggleColumn}>
+                        </lightning-input>
+                    </template>
+                </section>
+            </template>
+        </template>
+
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Loading data..."></lightning-spinner>
+        </template>
+
+        <template for:each={configsData} for:item="cfg">
+            <section key={cfg.configId} class="slds-m-around_medium">
+                <h3>{cfg.configName}</h3>
+
+                <template if:true={cfg.error}>
+                    <div class="slds-text-color_error">
+                        <p>{cfg.error}</p>
+                    </div>
+                </template>
+
+                <template if:true={cfg.data}>
+                    <lightning-datatable 
+                        key-field="id" 
+                        data={cfg.data} 
+                        columns={cfg.filteredColumns}>
+                    </lightning-datatable>
+                </template>
+            </section>
+        </template>
+    </lightning-card>
+</template>

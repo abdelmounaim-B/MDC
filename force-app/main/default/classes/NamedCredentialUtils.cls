@@ -1,65 +1,96 @@
 public with sharing class NamedCredentialUtils {
 
-    public class CreateResult {
-        @AuraEnabled public Boolean success;
-        @AuraEnabled public String namedCredentialName;
-        @AuraEnabled public String error;
+    public class CreateInput {
+        @InvocableVariable(required=true)
+        public String connectionName;
+
+        @InvocableVariable
+        public String label;
+
+        @InvocableVariable
+        public String endpoint;
+
+        @InvocableVariable
+        public String protocol;
+
+        @InvocableVariable
+        public String principalType;
+
+        @InvocableVariable
+        public String username;
+
+        @InvocableVariable
+        public String password;
+
+        @InvocableVariable
+        public String authProviderDevName;
+
+        @InvocableVariable
+        public String oauthScope;
     }
 
-    public static CreateResult createNamedCredential(
-        String name,
-        String label,
-        String endpoint,
-        String protocol,
-        String principalType,
-        String username,
-        String password,
-        String authProviderDevName,
-        String oauthScope
-    ) {
-        CreateResult result = new CreateResult();
+    public class CreateOutput {
+        @InvocableVariable
+        public Boolean success;
 
-        try {
-            MetadataService.MetadataPort service = new MetadataService.MetadataPort();
-            service.SessionHeader = new MetadataService.SessionHeader_element();
-            service.SessionHeader.sessionId = UserInfo.getSessionId();
+        @InvocableVariable
+        public String namedCredentialName;
 
-            MetadataService.NamedCredential nc = new MetadataService.NamedCredential();
-            nc.fullName = name;
-            nc.label = label;
-            nc.endpoint = endpoint;
-            nc.protocol = protocol;
-            nc.principalType = principalType;
-            nc.oauthScope = 'full_access';
+        @InvocableVariable
+        public String error;
+    }
 
-            if (protocol == 'PasswordAuthentication') {
-                nc.username = username;
-                nc.password = password;
-            }
+    @InvocableMethod(label='Create Named Credential' description='Creates a Named Credential via Metadata API')
+    public static List<CreateOutput> createNamedCredential(List<CreateInput> inputList) {
+        List<CreateOutput> results = new List<CreateOutput>();
 
-            if (protocol == 'OAuth' && authProviderDevName != null) {
-                nc.authProvider = authProviderDevName;
-            }
+        for (CreateInput input : inputList) {
+            CreateOutput result = new CreateOutput();
 
-            nc.allowMergeFieldsInHeader = false;
-            nc.allowMergeFieldsInBody = false;
+            try {
+                MetadataService.MetadataPort service = new MetadataService.MetadataPort();
+                service.SessionHeader = new MetadataService.SessionHeader_element();
+                service.SessionHeader.sessionId = UserInfo.getSessionId();
 
-            List<MetadataService.SaveResult> results = service.createMetadata(
-                new MetadataService.Metadata[] { nc });
+                MetadataService.NamedCredential nc = new MetadataService.NamedCredential();
+                nc.fullName = input.name;
+                nc.label = input.label;
+                nc.endpoint = input.endpoint;
+                nc.protocol = input.protocol;
+                nc.principalType = input.principalType;
+                nc.oauthScope = input.oauthScope;
 
-            if (!results.isEmpty() && results[0].success) {
-                result.success = true;
-                result.namedCredentialName = name;
-            } else {
+                if (input.protocol == 'PasswordAuthentication') {
+                    nc.username = input.username;
+                    nc.password = input.password;
+                }
+
+                if (input.protocol == 'OAuth' && input.authProviderDevName != null) {
+                    nc.authProvider = input.authProviderDevName;
+                }
+
+                nc.allowMergeFieldsInHeader = false;
+                nc.allowMergeFieldsInBody = false;
+
+                List<MetadataService.SaveResult> saveResults = service.createMetadata(
+                    new MetadataService.Metadata[] { nc });
+
+                if (!saveResults.isEmpty() && saveResults[0].success) {
+                    result.success = true;
+                    result.namedCredentialName = input.name;
+                } else {
+                    result.success = false;
+                    result.error = saveResults[0].errors[0].message;
+                }
+
+            } catch (Exception e) {
                 result.success = false;
-                result.error = results[0].errors[0].message;
+                result.error = e.getMessage();
             }
 
-        } catch (Exception e) {
-            result.success = false;
-            result.error = e.getMessage();
+            results.add(result);
         }
 
-        return result;
+        return results;
     }
 }

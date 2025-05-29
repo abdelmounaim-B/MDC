@@ -2,13 +2,12 @@ import { LightningElement, api, track } from "lwc";
 import getAllActiveConfigData from "@salesforce/apex/ExternalAPIHandler.getAllActiveConfigData";
 import Loader from "@salesforce/resourceUrl/Loader";
 
-export default class ReportViewer extends LightningElement {
+export default class ReportDonutViewer extends LightningElement {
   @api recordId;
 
   @track isLoading = false;
   @track error;
   @track groupedReports = [];
-
   loaderUrl = Loader;
 
   chartJsLoaded = false;
@@ -20,41 +19,42 @@ export default class ReportViewer extends LightningElement {
 
   async loadGroupedData() {
     this.isLoading = true;
+    this.error = null;
+
     try {
       const results = await getAllActiveConfigData({ recordId: this.recordId });
 
       const configs = results || [];
 
       this.groupedReports = configs.map((cfg) => {
-        const groupByFields = (cfg.mappingFields || [])
-          .filter((f) => f.Report_Type__c === "Group By - Bar")
-          .map((f) => f.Field_Label__c);
+      const groupByFields = (cfg.mappingFields || [])
+        .filter((f) => f.Report_Type__c === "Group By - donut")
+        .map((f) => f.Field_Label__c);
 
-        const groupCharts = groupByFields.map((field) => {
-          const counts = {};
-          cfg.data.forEach((row) => {
-            const key = row[field] || "∅ (empty)";
-            counts[key] = (counts[key] || 0) + 1;
-          });
-
-          return {
-            chartId: `chart-${cfg.configId}-${field.replace(/\s+/g, "_")}`,
-            field,
-            labels: Object.keys(counts),
-            values: Object.values(counts),
-          };
+      const groupCharts = groupByFields.map((field) => {
+        const counts = {};
+        cfg.data.forEach((row) => {
+          const key = row[field] || "∅ (empty)";
+          counts[key] = (counts[key] || 0) + 1;
         });
 
         return {
-          configId: cfg.configId,
-          configName: cfg.configName,
-          charts: groupCharts,
-          connectionName: cfg.connectionName,
-
+          chartId: `chart-${cfg.configId}-${field.replace(/\s+/g, "_")}`,
+          field,
+          labels: Object.keys(counts),
+          values: Object.values(counts),
         };
       });
 
-      // Defer rendering until DOM is ready
+      return {
+        configId: cfg.configId,
+        configName: cfg.configName,
+        connectionName: cfg.connectionName,
+        charts: groupCharts,
+      };
+    });
+
+      // Defer rendering until DOM ready
       setTimeout(() => this.renderAllCharts(), 0);
     } catch (err) {
       this.error = err.body?.message || "Error loading grouped data.";
@@ -71,6 +71,7 @@ export default class ReportViewer extends LightningElement {
       "https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js";
     script.onload = () => {
       this.chartJsLoaded = true;
+      this.renderAllCharts(); // render if data is ready
     };
     script.onerror = () => {
       this.error = "Failed to load Chart.js";
@@ -89,15 +90,21 @@ export default class ReportViewer extends LightningElement {
         if (!canvas) return;
 
         new Chart(canvas.getContext("2d"), {
-          type: "bar",
+          type: "doughnut", 
           data: {
             labels: chart.labels,
             datasets: [
               {
                 label: chart.field,
                 data: chart.values,
-                backgroundColor: "rgba(190, 31, 185, 0.6)",
-                borderColor: "rgb(226, 51, 173)",
+                backgroundColor: [
+                  "#c38bbf",
+                  "#ad66a9",
+                  "#973e95",
+                  "#800080",
+                  "#7d2164",
+                  "#ad66a9",
+                ],
                 borderWidth: 1,
               },
             ],
@@ -105,16 +112,11 @@ export default class ReportViewer extends LightningElement {
           options: {
             responsive: true,
             plugins: {
-              legend: { display: false },
+              legend: { display: true, position: "right" },
               title: { display: true, text: chart.field },
             },
-            scales: {
-              y: {
-                beginAtZero: true,
-                title: { display: true, text: "Count" },
-              },
-            },
           },
+          
         });
       });
     });

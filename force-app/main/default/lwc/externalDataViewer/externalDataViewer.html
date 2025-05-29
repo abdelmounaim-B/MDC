@@ -1,56 +1,84 @@
 <template>
-    <lightning-card title="External Data Viewer" icon-name="utility:connected_apps">
-        <div class="slds-m-around_medium">
-            <div class="slds-grid slds-grid_align-spread">
-                <lightning-button-icon icon-name="utility:settings" 
-                                       alternative-text="Settings"
-                                       onclick={toggleSettings}
-                                       class="settings-icon">
-                </lightning-button-icon>
-            </div>
+   <template if:true={canSeeJistTables}>
+    <lightning-card>
+        <div class="logo-header">
+            <img src={loaderUrl} alt="Logo" />
+            <h3>Jisr Data Viewer</h3>
         </div>
-
-        <template if:true={showSettings}>
-            <template for:each={configsData} for:item="cfg">
-                <section key={cfg.configId} class="slds-m-around_medium settings-section">
-                    <h3>{cfg.configName} - Column Settings</h3>
-                    <template for:each={cfg.availableColumns} for:item="col">
-                        <lightning-input 
-                            type="checkbox" 
-                            key={col.fieldName} 
-                            label={col.label} 
-                            checked={col.visible} 
-                            data-configid={cfg.configId}
-                            data-field={col.fieldName}
-                            onchange={toggleColumn}>
-                        </lightning-input>
-                    </template>
-                </section>
+        <div class="slds-grid slds-wrap">
+            <!-- Sidebar Settings -->
+            <template if:true={showSettings}>
+                <template if:true={canDisplayHideColumns}>
+                    <div class="slds-size_1-of-4 slds-p-around_medium slds-border_right">
+                        <template for:each={configsData} for:item="cfg">
+                            <section key={cfg.configId} class="settings-section">
+                                <h3>{cfg.configName} - Column Settings</h3>
+                                <template for:each={cfg.availableColumns} for:item="col">
+                                    <lightning-input 
+                                        type="checkbox" 
+                                        key={col.fieldName} 
+                                        label={col.label} 
+                                        checked={col.visible} 
+                                        data-configid={cfg.configId}
+                                        data-field={col.fieldName}
+                                        onchange={toggleColumn}>
+                                    </lightning-input>
+                                </template>
+                            </section>
+                        </template>
+                    </div>
+                </template>
             </template>
-        </template>
 
-        <template if:true={isLoading}>
-            <lightning-spinner alternative-text="Loading data..."></lightning-spinner>
-        </template>
-
-        <template for:each={configsData} for:item="cfg">
-            <section key={cfg.configId} class="slds-m-around_medium">
-                <h3>{cfg.configName}</h3>
-
-                <template if:true={cfg.error}>
-                    <div class="slds-text-color_error">
-                        <p>{cfg.error}</p>
+            <!-- Main Content Area -->
+            <div class={mainContentClass}>
+                <template if:true={canDisplayHideColumns}>
+                    <div class="slds-grid slds-grid_align-end slds-m-bottom_small">
+                        <lightning-button-icon 
+                            icon-name="utility:settings" 
+                            alternative-text="Toggle Settings"
+                            onclick={toggleSettings}>
+                        </lightning-button-icon>
                     </div>
                 </template>
 
-                <template if:true={cfg.data}>
-                    <lightning-datatable 
-                        key-field="id" 
-                        data={cfg.data} 
-                        columns={cfg.filteredColumns}>
-                    </lightning-datatable>
+                <template if:true={isLoading}>
+                    <div class="custom-loader" style="display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        min-height: 200px;">
+                        <img src={loaderUrl} alt="Loading..." style="width: 100px; height: auto;" />
+                    </div>
                 </template>
-            </section>
-        </template>
+
+                <template for:each={configsData} for:item="cfg">
+                    <section key={cfg.configId} class="slds-m-bottom_medium">
+                        <h3 class="slds-text-heading_medium slds-text-align_center slds-m-bottom_medium">
+                            {cfg.connectionName} — {cfg.configName}
+                        </h3>
+
+                        <template if:true={cfg.error}>
+                            <div class="slds-text-color_error">
+                                <p>{cfg.error}</p>
+                            </div>
+                        </template>
+
+                        <template if:true={cfg.data}>
+                            <div class="MyTable">
+                                <lightning-datatable
+                                    key-field="id"
+                                    data={cfg.data}
+                                    columns={cfg.filteredColumns}
+                                    hide-checkbox-column
+                                    row-class={getRowClass}>
+                                </lightning-datatable>
+                            </div>
+                        </template>
+                    </section>
+                </template>
+            </div>
+        </div>
     </lightning-card>
 </template>
+</template>
+

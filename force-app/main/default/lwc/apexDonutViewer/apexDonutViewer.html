@@ -1,0 +1,40 @@
+<template>
+    <template if:true={canSeeJisrDonutsReports}>
+        <lightning-card>
+            <div class="logo-header">
+                <img src={loaderUrl} alt="Logo" />
+                <h3>Jisr Repports [Donuts]</h3>
+            </div>
+
+            <template if:true={isLoading}>
+                <div class="custom-loader" style="display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    min-height: 200px;">
+                    <img src={loaderUrl} alt="Loading..." style="width: 100px; height: auto;" />
+                </div>
+            </template>
+
+            <template if:true={error}>
+                <div class="slds-text-color_error slds-p-around_medium">{error}</div>
+            </template>
+
+            <template for:each={groupedReports} for:item="cfg">
+                <section key={cfg.configId} class="slds-m-around_medium">
+                    <template if:true={cfg.charts.length}>
+                        <h3 class="slds-text-heading_medium slds-text-align_center slds-m-bottom_medium">
+                            {cfg.connectionName} — {cfg.configName}
+                        </h3>
+                    </template>
+                    <div class="box">
+                        <template for:each={cfg.charts} for:item="chart">
+                            <div key={chart.chartId}>
+                                <div data-id={chart.chartId}></div>
+                            </div>
+                        </template>
+                    </div>
+                </section>
+            </template>
+        </lightning-card>
+    </template>
+</template>

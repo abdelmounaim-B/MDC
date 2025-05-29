@@ -1,14 +1,15 @@
 <template>
+  <div class="repportCard">
   <lightning-card>
-    <!-- Custom logo instead of icon -->
+
     <div class="logo-header">
       <img src={loaderUrl} alt="Logo" />
-      <h3>Jisr Repports [Barrs]</h3>
+      <h3>Jisr Repports [Donuts]</h3>
     </div>
 
     <template if:true={isLoading}>
       <div class="custom-loader">
-        <img src={loaderUrl} alt="Loading..." style="width: 100px; height: auto;" />
+      <img src={loaderUrl} alt="Loading..." style="width: 100px; height: auto;"/>
       </div>
     </template>
 
@@ -18,19 +19,23 @@
 
     <template for:each={groupedReports} for:item="cfg">
       <section key={cfg.configId} class="slds-m-around_medium">
-        <template if:true={cfg.charts.length}>
+      <template if:true={cfg.charts.length}>
           <h3 class="slds-text-heading_medium slds-text-align_center slds-m-bottom_medium">
-{cfg.connectionName} — {cfg.configName}          </h3>
+            {cfg.connectionName} — {cfg.configName}
+          </h3>
         </template>
-
-        <div class="box">
+       <div class="box">
           <template for:each={cfg.charts} for:item="chart">
             <div key={chart.chartId}>
-              <canvas data-id={chart.chartId} style="height: 100%;"></canvas>
+              <canvas data-id={chart.chartId} style="height: 100px !important;"></canvas>
             </div>
           </template>
         </div>
+
       </section>
+
     </template>
+
   </lightning-card>
+  </div>
 </template>

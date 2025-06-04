@@ -1,18 +1,18 @@
 import { LightningElement, api, track } from 'lwc';
 import getAllActiveConfigData from '@salesforce/apex/ExternalAPIHandler.getAllActiveConfigData';
 import Loader from '@salesforce/resourceUrl/Loader';
-import canSeeJisrDonutsReports from '@salesforce/customPermission/Can_see_Jisr_Donuts_Repports';
+import canSeeJisrBarrsReports from '@salesforce/customPermission/Can_see_Jisr_Barrs_Repports';
 
-export default class ApexDonutViewer extends LightningElement {
+export default class jisrAllBarRepports extends LightningElement {
   @api recordId;
   @track isLoading = false;
   @track error = null;
   @track groupedReports = [];
+  canSeeJisrBarrsReports = canSeeJisrBarrsReports;
 
   loaderUrl = Loader;
   apexChartsLoaded = false;
 
-  canSeeJisrDonutsReports = canSeeJisrDonutsReports;
   connectedCallback() {
     this.loadApexCharts();
     this.loadGroupedData();
@@ -21,9 +21,8 @@ export default class ApexDonutViewer extends LightningElement {
   loadApexCharts() {
     if (this.apexChartsLoaded) return;
 
-    const script = document.createElement("script");
-    script.src = "https://cdn.jsdelivr.net/npm/apexcharts";
-
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/apexcharts';
     script.onload = () => {
       if (typeof window.ApexCharts !== 'undefined') {
         this.apexChartsLoaded = true;
@@ -32,24 +31,21 @@ export default class ApexDonutViewer extends LightningElement {
         this.error = 'ApexCharts not available via CDN.';
       }
     };
-
     script.onerror = () => {
       this.error = 'Failed to load ApexCharts from CDN.';
     };
-
     document.head.appendChild(script);
   }
 
   async loadGroupedData() {
     this.isLoading = true;
-
     try {
       const results = await getAllActiveConfigData({ recordId: this.recordId });
 
       this.groupedReports = results.map(cfg => {
         const groupByFields = (cfg.mappingFields || [])
-          .filter(f => f.Report_Type__c === 'Group By - donut')
-          .map(f => f.Field_Label__c);
+          .filter(f => f.JisrTest__Report_Type__c === 'Group By - Bar')
+          .map(f => f.JisrTest__Field_Label__c);
 
         const charts = groupByFields.map(field => {
           const counts = {};
@@ -76,7 +72,7 @@ export default class ApexDonutViewer extends LightningElement {
 
       setTimeout(() => this.renderAllCharts(), 0);
     } catch (err) {
-      this.error = err.body?.message || 'Error loading data';
+      this.error = err.body?.message || 'Error loading grouped data.';
     } finally {
       this.isLoading = false;
     }
@@ -92,24 +88,24 @@ export default class ApexDonutViewer extends LightningElement {
 
         const options = {
           chart: {
-            type: 'donut',
-            height: 300
+            type: 'bar',
+            height: 250
           },
-          fill: {
-            type: 'gradient'
+          series: [{
+            name: 'Count',
+            data: chart.values
+          }],
+          xaxis: {
+            categories: chart.labels,
+            labels: {
+              rotate: -45
+            }
           },
-          dataLabels: {
-            enabled: false
-          },
-          series: chart.values,
-          labels: chart.labels,
           title: {
-            text: chart.field
+            text: chart.field,
+            align: 'left'
           },
-          legend: {
-            position: 'right'
-          },
-          colors: ['#c38bbf', '#ad66a9', '#973e95', '#800080', '#7d2164', '#ad66a9']
+          colors: ['#b81b9d']
         };
 
         const chartInstance = new window.ApexCharts(target, options);

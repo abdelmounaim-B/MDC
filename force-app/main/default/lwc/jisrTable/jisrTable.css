@@ -1,0 +1,60 @@
+:host {
+  --sds-c-card-color-background: #f8f2ff;
+}
+
+.custom-loader{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+.logo-header {
+display: flex;
+align-items: center;
+
+font-weight: bold;
+font-size: 1.2rem;
+}
+
+.logo-header img {
+height: 40px;
+margin-right: 10px;
+margin-left: 20px;
+}
+
+
+/* Table background */
+.MyTable table {
+  background-color: rgb(246, 241, 251);
+}
+
+/* Header styling */
+.MyTable thead {
+  background-color: rgb(106, 76, 133); /* Darker purple */
+  color: white;
+  font-weight: bold;
+}
+
+/* Totals row */
+.MyTable tr.totals-row {
+  font-weight: bold;
+}
+
+.header {
+  background-color: rgb(106, 76, 133); /* Darker purple */
+  color: white;
+  font-weight: bold;
+}
+
+thead th {
+  background-color: rgb(106, 76, 133); /* Darker purple */
+  color: white;
+  font-weight: bold;
+}
+
+
+tbody tr:last-child {
+  font-weight: bold;
+      background-color: rgb(232 222 242) !important; /* Lighter purple */
+}

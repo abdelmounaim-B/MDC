@@ -1,0 +1,23 @@
+<template>
+  <lightning-card>
+    <div class="logo-header">
+      <img src={loaderUrl} alt="Logo" />
+      <h3>Jisr Repport</h3>
+    </div>
+
+    <template if:true={isLoading}>
+      <div class="custom-loader">
+        <img src={loaderUrl} alt="Loading..." style="width: 100px; height: auto;" />
+      </div>
+    </template>
+
+    <template if:true={error}>
+      <div class="slds-text-color_error slds-p-around_medium">{error}</div>
+    </template>
+
+    <!-- Render chart container only after data is loaded -->
+    <template if:true={chartData}>
+      <div data-id="chart" class="chart-container"></div>
+    </template>
+  </lightning-card>
+</template>

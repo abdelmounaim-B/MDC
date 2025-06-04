@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Protocol__c</fullName>
+    <label>Protocol</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>OAuth 2.0</fullName>
+                <default>false</default>
+                <label>OAuth 2.0</label>
+            </value>
+            <value>
+                <fullName>Username / Password</fullName>
+                <default>false</default>
+                <label>Username / Password</label>
+            </value>
+            <value>
+                <fullName>JWT</fullName>
+                <default>false</default>
+                <label>JWT</label>
+            </value>
+            <value>
+                <fullName>No Authentication</fullName>
+                <default>false</default>
+                <label>No Authentication</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

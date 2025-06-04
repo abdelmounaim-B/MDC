@@ -1,0 +1,4 @@
+.disabled {
+    pointer-events: none; /* Disables clicking */
+    opacity: 0.6; /* Grays out the component */
+}

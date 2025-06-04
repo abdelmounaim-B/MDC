@@ -25,7 +25,7 @@ export default class ExternalDataViewer extends LightningElement {
 
     async loadAllConfigsData() {
         this.isLoading = true;
-        try {
+        try { 
             const configs = await getAllActiveConfigData({ recordId: this.recordId });
             this.configsData = configs.map(cfg => {
                 const dataWithPlaceholder = [...cfg.data];
@@ -46,8 +46,8 @@ export default class ExternalDataViewer extends LightningElement {
 
                     // Populate SUM fields
                     mappingFields
-                        .filter(f => f.Report_Type__c === 'SUM')
-                        .map(f => f.Field_Label__c)
+                        .filter(f => f.JisrTest__Report_Type__c === 'SUM')
+                        .map(f => f.JisrTest__Field_Label__c)
                         .forEach(field => {
                             const total = cfg.data.reduce((acc, row) => acc + (parseFloat(row[field]) || 0), 0);
                             emptyRow[field] = `${SUM}: ${total}`;
@@ -55,20 +55,19 @@ export default class ExternalDataViewer extends LightningElement {
 
                     // Populate AVERAGE fields
                     mappingFields
-                        .filter(f => f.Report_Type__c === 'Average')
-                        .map(f => f.Field_Label__c)
+                        .filter(f => f.JisrTest__Report_Type__c === 'Average')
+                        .map(f => f.JisrTest__Field_Label__c)
                         .forEach(field => {
                             const total = cfg.data.reduce((acc, row) => acc + (parseFloat(row[field]) || 0), 0);
                             const average = total / cfg.data.length;
                             emptyRow[field] = `${Average}: ${average.toFixed(2)}`;
                         });
+                } else {
+                    console.log(`⚠️ No data found for config: ${cfg.configName}`);
                 }
 
                 dataWithPlaceholder.push(emptyRow);
-
-                this.logSumFields(cfg.data, mappingFields);
-                this.logAverageFields(cfg.data, mappingFields);
-
+                
                 return {
                     configId: cfg.configId,
                     configName: cfg.configName,
@@ -81,38 +80,16 @@ export default class ExternalDataViewer extends LightningElement {
                 };
             });
 
-            this.configsData.forEach(cfg => this.initializeColumns(cfg));
-        } catch (error) {
-            console.error('Error loading config data:', error);
+            this.configsData.forEach(cfg => {
+                this.initializeColumns(cfg);
+                this.prepareDisplayData(cfg);
+            });        } catch (error) {
         } finally {
             this.isLoading = false;
         }
     }
 
-    logSumFields(data, mappingFields) {
-        if (!data || !mappingFields) return;
-
-        const sumFields = mappingFields
-            .filter(f => f.Report_Type__c === 'SUM')
-            .map(f => f.Field_Label__c);
-
-        sumFields.forEach(field => {
-            data.reduce((acc, row) => acc + (parseFloat(row[field]) || 0), 0);
-        });
-    }
-
-    logAverageFields(data, mappingFields) {
-        if (!data || !mappingFields) return;
-
-        const averageFields = mappingFields
-            .filter(f => f.Report_Type__c === 'Average')
-            .map(f => f.Field_Label__c);
-
-        averageFields.forEach(field => {
-            data.reduce((acc, row) => acc + (parseFloat(row[field]) || 0), 0);
-        });
-    }
-
+  
     
 
     initializeColumns(cfg) {
@@ -140,26 +117,43 @@ export default class ExternalDataViewer extends LightningElement {
     }
 
     toggleColumn(event) {
-        const configId = event.target.dataset.configid;
-        const field = event.target.dataset.field;
+    const configId = event.target.dataset.configid;
+    const field = event.target.dataset.field;
 
-        let cfg = this.configsData.find(c => c.configId === configId);
-        if (!cfg) return;
+    let cfg = this.configsData.find(c => c.configId === configId);
+    if (!cfg) return;
 
-        cfg.availableColumns = cfg.availableColumns.map(col => {
-            if (col.fieldName === field) {
-                col.visible = event.target.checked;
-            }
-            return col;
-        });
-        cfg.filteredColumns = cfg.availableColumns.filter(col => col.visible);
+    // Update visibility
+    cfg.availableColumns = cfg.availableColumns.map(col => {
+        if (col.fieldName === field) {
+            col.visible = event.target.checked;
+        }
+        return col;
+    });
 
-        this.configsData = [...this.configsData];
-    }
+    cfg.filteredColumns = cfg.availableColumns.filter(col => col.visible);
 
+    // 🔥 Re-prepare display data so rows match new columns
+    this.prepareDisplayData(cfg);
+
+    // Force refresh
+    this.configsData = [...this.configsData];
+}
     toggleSettings() {
         this.showSettings = !this.showSettings;
     }
+
+    prepareDisplayData(cfg) {
+    cfg.displayData = cfg.data.map((row, index) => {
+        return {
+            id: row.id || index,
+            cells: cfg.filteredColumns.map(col => ({
+                key: col.fieldName,
+                value: row[col.fieldName] || ''
+            }))
+        };
+    });
+}
 
     get mainContentClass() {
   return this.showSettings

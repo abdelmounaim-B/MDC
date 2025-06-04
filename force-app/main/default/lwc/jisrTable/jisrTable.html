@@ -1,0 +1,72 @@
+<template>
+  <lightning-card>
+    <div class="logo-header">
+      <img src={loaderUrl} alt="Logo" />
+      <template if:true={config}>
+        <h3>Jisr : {config.configName}</h3>
+      </template>   
+    </div>
+
+    <template if:true={isLoading}>
+      <div class="custom-loader">
+          <img src={loaderUrl} alt="Loading..." style="width: 100px; height: auto;" />
+      </div>
+  </template>
+    <div class="slds-grid slds-wrap wrapper">
+
+      <template if:true={showSettings}>
+        <template if:true={canDisplayHideColumns}>
+          <div class="slds-size_1-of-4 slds-p-around_medium slds-border_right">
+            <section class="settings-section">
+              <h3>{config.configName} - Column Settings</h3>
+              <template for:each={availableColumns} for:item="col">
+                <lightning-input
+                  type="checkbox"
+                  key={col.fieldName}
+                  label={col.label}
+                  checked={col.visible}
+                  data-field={col.fieldName}
+                  onchange={toggleColumn}>
+                </lightning-input>
+              </template>
+            </section>
+          </div>
+        </template>
+      </template>
+
+      <div class={mainContentClass}>
+        <template if:true={canDisplayHideColumns}>
+          <div class="slds-grid slds-grid_align-end slds-m-bottom_small">
+              <lightning-button-icon 
+                  icon-name="utility:settings" 
+                  alternative-text="Toggle Settings"
+                  onclick={toggleSettings}>
+              </lightning-button-icon>
+          </div>
+      </template>
+        <template if:true={config}>
+          <div class="MyTable">
+            <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+              <thead>
+                <tr>
+                  <template for:each={filteredColumns} for:item="col">
+                    <th key={col.fieldName}>{col.label}</th>
+                  </template>
+                </tr>
+              </thead>
+              <tbody>
+                <template for:each={displayData} for:item="row">
+                  <tr key={row.id}>
+                    <template for:each={row.cells} for:item="cell">
+                      <td key={cell.key}>{cell.value}</td>
+                    </template>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+        </template>
+      </div>
+    </div>
+  </lightning-card>
+</template>

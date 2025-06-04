@@ -1,0 +1,15 @@
+<!-- lookupField.html -->
+<template>
+    <fieldset class={computedClass}>
+        <lightning-record-picker 
+            label="label"
+            variant="label-hidden"
+            placeholder="Search..."
+            value={value}
+            object-api-name={objectName}
+            onchange={handleSelect}
+
+            matching-info={matchingInfo}
+        ></lightning-record-picker>
+    </fieldset>
+</template>

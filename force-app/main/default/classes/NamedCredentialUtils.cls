@@ -2,7 +2,7 @@ public with sharing class NamedCredentialUtils {
 
     public class CreateInput {
         @InvocableVariable(required=true)
-        public String connectionName;
+        public String name;
 
         @InvocableVariable
         public String label;

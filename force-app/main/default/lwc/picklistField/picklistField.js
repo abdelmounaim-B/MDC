@@ -8,11 +8,10 @@ export default class PicklistField extends LightningElement {
     @api fieldName;
 
     handleChange(event) {
-        this.dispatchEvent(new CustomEvent('picklistchange', {
-            detail: { recordId: this.recordId, fieldName: this.fieldName, value: event.detail.value },
-            bubbles: true, // Allow event to propagate up
-            composed: true  // Cross Shadow DOM boundary
-        }));
-
-    }
+    this.dispatchEvent(new CustomEvent('picklistchange', {
+        detail: { recordId: this.recordId, fieldName: this.fieldName, value: event.detail.value },
+        bubbles: true,
+        composed: true
+    }));
+}
 }

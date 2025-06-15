@@ -6,25 +6,25 @@ import REPORT_TYPE_FIELD from '@salesforce/schema/External_System_Field_Mapping_
 const COLUMNS = [
     {
         label: 'JSON Path',
-        fieldName: 'Field_JSON_Path__c',
+        fieldName: 'JisrTest__Field_JSON_Path__c',
         type: 'text',
         editable: true
     },
     {
         label: 'Label',
-        fieldName: 'Field_Label__c',
+        fieldName: 'JisrTest__Field_Label__c',
         type: 'text',
         editable: true
     },
     {
         label: 'Report Type',
-        fieldName: 'Report_Type__c',
+        fieldName: 'JisrTest__Report_Type__c',
         type: 'customPicklist',
         wrapText: true,
         typeAttributes: {
-            value: { fieldName: 'Report_Type__c' },
+            value: { fieldName: 'JisrTest__Report_Type__c' },
             recordId: { fieldName: 'tempId' },
-            fieldName: 'Report_Type__c',
+            fieldName: 'JisrTest__Report_Type__c',
             options: { fieldName: 'picklistOptions' },
             onChange: 'handlePicklistChange'
         }
@@ -91,7 +91,6 @@ export default class FieldsTable extends LightningElement {
             }
             this.mappings = this.mappings.filter(m => m.tempId !== row.tempId);
         }
-        console.log('Row action:',  row);
     }
 
     handlePicklistChange(event) {
@@ -105,8 +104,6 @@ export default class FieldsTable extends LightningElement {
         [fieldName]: value
     };
         
-        console.log('Updated draft:', JSON.stringify(updatedDraft) );
-
     this.updateDraftValues([updatedDraft]);
 }
 
@@ -114,70 +111,80 @@ export default class FieldsTable extends LightningElement {
     handleCellChange(event) {
         const updatedValues = event.detail.draftValues;
         this.updateDraftValues(updatedValues);
+        this.saveMappings();
     }
 
     updateDraftValues(updatedValues) {
-    updatedValues.forEach(newVal => {
-        const index = this.draftValues.findIndex(d => d.Id === newVal.Id);
-        console.log('Draft values before update:', JSON.stringify(this.draftValues) );
-        if (index !== -1) {
-            this.draftValues[index] = { ...this.draftValues[index], ...newVal };
-        } else {
-            this.draftValues.push(newVal);
-        }
-        console.log('Draft values:', JSON.stringify(this.draftValues) );
-    });
-
-    this.mappings = this.mappings.map(map => {
-        const updates = this.draftValues.filter(d => d.Id === map.tempId);
-        let merged = { ...map };
-        updates.forEach(draft => {
-            merged = { ...merged, ...draft };
+        updatedValues.forEach(newVal => {
+            const index = this.draftValues.findIndex(d => d.Id === newVal.Id);
+            if (index !== -1) {
+                this.draftValues[index] = { ...this.draftValues[index], ...newVal };
+            } else {
+                this.draftValues.push(newVal);
+            }
         });
-        return merged;
-    });
-}
+    
+    
+        this.mappings = this.mappings.map(map => {
+            const updates = this.draftValues.filter(d => d.Id === map.tempId);
+            let merged = { ...map };
+            updates.forEach(draft => {
+                merged = { ...merged, ...draft };
+            });
+            return merged;
+        });
+    
+    }
 
 
     addMapping() {
-        this.mappings = [
-            ...this.mappings,
-            {
-                Id: null,
-                tempId: `temp-${this.nextTempId++}`,
-                Field_JSON_Path__c: '',
-                Field_Label__c: '',
-                Report_Type__c: '',
-                picklistOptions: this.picklistOptions
-            }
-        ];
+        const tempId = `temp-${this.nextTempId++}`;
+        const newMapping = {
+            Id: tempId, 
+            tempId: tempId,
+            JisrTest__Field_JSON_Path__c: '',
+            JisrTest__Field_Label__c: '',
+            JisrTest__Report_Type__c: '',
+            picklistOptions: this.picklistOptions
+        };
+        this.mappings = [...this.mappings, newMapping];
     }
 
     async saveMappings() {
         this.isLoading = true;
-
+    
         try {
+            // Apply any draft value updates to mappings
             this.mappings = this.mappings.map(map => {
                 const updated = this.draftValues.find(d => d.Id === map.tempId);
                 return updated ? { ...map, ...updated } : map;
             });
-
-            const formatted = this.mappings.map(m => {
+    
+            // Filter out rows where all values are empty
+            const filtered = this.mappings.filter(m =>
+                m.JisrTest__Field_JSON_Path__c?.trim() ||
+                m.JisrTest__Field_Label__c?.trim() ||
+                m.JisrTest__Report_Type__c?.trim()
+            );
+    
+            // Clean up props and prepare for save
+            const formatted = filtered.map(m => {
                 const { tempId, picklistOptions, ...clean } = m;
                 if (!clean.Id || clean.Id.startsWith('temp-')) {
                     delete clean.Id;
                 }
                 return clean;
             });
-
+    
             this.recordsToCreate = formatted;
-
+    
             console.log('💾 Records to create (Flow output):', JSON.stringify(this.recordsToCreate, null, 2));
-
+    
         } catch (error) {
             console.error('Error formatting records:', error);
         }
-
+    
         this.isLoading = false;
     }
+    
 }

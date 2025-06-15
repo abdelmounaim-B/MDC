@@ -1,0 +1,86 @@
+/* :host {
+  --fix-table-overflow: initial;
+}
+
+.table-scroll ::deep(.slds-table_header-fixed_container) {
+  overflow: visible !important;
+  z-index: auto !important;
+}
+
+.slds-scope .slds-scrollable_y, .slds-scope .slds-scrollable--y{
+  overflow: visible !important;
+  max-height: none !important;
+  overflow-y: visible !important;
+}
+
+.slds-scope .slds-table_header-fixed_container, .slds-scope .slds-table--header-fixed_container {
+  overflow: visible !important;
+  max-height: none !important;
+  overflow-y: visible !important;
+}
+
+.slds-scope .slds-scrollable_x, .slds-scope .slds-scrollable--x {
+  overflow: visible !important;
+  max-width: none !important;
+  overflow-x: visible !important;
+} */
+
+
+
+
+/* Alternative approach - Only target specific elements that need overflow visible */
+
+:host {
+  --fix-table-overflow: initial;
+}
+
+/* Base container styling */
+.table-container {
+  position: relative;
+}
+
+.table-scroll {
+  position: relative;
+  min-height: 300px;
+}
+
+/* SELECTIVE approach - only fix overflow for dropdown-related elements */
+
+/* Allow combobox dropdowns to show */
+.table-scroll ::deep(.slds-combobox) {
+  position: relative;
+  z-index: 100;
+}
+
+/* Ensure dropdown lists are visible */
+.table-scroll ::deep(.slds-dropdown),
+.table-scroll ::deep(.slds-listbox),
+.table-scroll ::deep(.slds-combobox__dropdown) {
+  position: absolute !important;
+  z-index: 9999 !important;
+  /* Don't override overflow on parent containers */
+}
+
+/* Only override overflow on the immediate dropdown container */
+.table-scroll ::deep(.slds-combobox_container) {
+  overflow: visible !important;
+  position: relative;
+  z-index: 100;
+}
+
+/* For Screen Flow specific issues */
+:host(.flexipageComponent) .table-scroll ::deep(.slds-combobox_container),
+:host(.runtime_flexpageRegionHost) .table-scroll ::deep(.slds-combobox_container) {
+  overflow: visible !important;
+}
+
+/* If still having issues, try this more targeted approach */
+.table-scroll ::deep(c-picklist-field) {
+  position: relative;
+  z-index: 100;
+  overflow: visible;
+}
+
+.table-scroll ::deep(c-picklist-field .slds-form-element) {
+  overflow: visible;
+}

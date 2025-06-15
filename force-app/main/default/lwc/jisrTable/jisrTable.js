@@ -115,8 +115,8 @@ export default class JisrTable extends LightningElement {
 
   get mainContentClass() {
     return this.showSettings
-      ? 'slds-size_3-of-4 slds-p-around_medium'
-      : 'slds-size_1-of-1 slds-p-around_medium';
+      ? 'slds-size_3-of-4 slds-p-around_medium wrapper'
+      : 'slds-size_1-of-1 slds-p-around_medium wrapper';
   }
 
   toggleSettings() {

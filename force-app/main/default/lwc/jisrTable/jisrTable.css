@@ -58,3 +58,8 @@ tbody tr:last-child {
   font-weight: bold;
       background-color: rgb(232 222 242) !important; /* Lighter purple */
 }
+
+.wrapper {
+  max-width: 100%;
+  overflow-x: scroll;
+}

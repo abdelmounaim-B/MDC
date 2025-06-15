@@ -49,7 +49,7 @@ export default class JisrReport extends LightningElement {
                 recordId: this.recordId
             });
 
-            this.reportTitle = `${result.configName} — ${result.fieldLabel}`;
+            this.reportTitle = `${result.configLabel} — ${result.fieldLabel}`;
             this.chartData = result.data;
             this.reportType = result.reportType;
 

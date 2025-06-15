@@ -9,7 +9,7 @@
     </targets>
     <targetConfigs>
         <targetConfig targets="lightning__FlowScreen">
-            <property name="recordsToCreate" type="@salesforce/schema/External_System_Field_Mapping__c[]" label="Mapping Fields To create" role="outputOnly" />
+            <property name="recordsToCreate" type="@salesforce/schema/JisrTest__External_System_Field_Mapping__c[]" label="Mapping Fields To create test" role="outputOnly" />
         </targetConfig>
     </targetConfigs>
 </LightningComponentBundle>

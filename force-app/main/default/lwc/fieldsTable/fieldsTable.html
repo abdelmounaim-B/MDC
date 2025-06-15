@@ -1,25 +1,26 @@
 <template>
     <lightning-card>
-        <div class="slds-m-around_medium" style="min-height: 400px;">
+        <div class="slds-m-around_medium table-container">
             <template if:true={isLoading}>
                 <lightning-spinner alternative-text="Chargement..."></lightning-spinner>
             </template>
 
-            <c-custom-data-table 
-                key-field="Id"
-                data={mappings}
-                columns={columns}
-                draft-values={draftValues}
-                hide-checkbox-column
-                suppress-bottom-bar
-                oncellchange={handleCellChange}
-                onpicklistchange={handlePicklistChange}
-                onrowaction={handleRowAction}
-            ></c-custom-data-table>
+            <div class="table-scroll" style="min-height: 300px; overflow: visible !important; z-index: 1000;">
+                <c-custom-data-table 
+                    key-field="Id"
+                    data={mappings}
+                    columns={columns}
+                    draft-values={draftValues}
+                    hide-checkbox-column
+                    suppress-bottom-bar
+                    oncellchange={handleCellChange}
+                    onpicklistchange={handlePicklistChange}
+                    onrowaction={handleRowAction}
+                ></c-custom-data-table>
+            </div>
 
             <div class="slds-m-top_medium">
                 <lightning-button label="Ajouter" onclick={addMapping} icon-name="utility:add" variant="neutral"></lightning-button>
-                <lightning-button label="Enregistrer" onclick={saveMappings} variant="brand" icon-name="utility:save" class="slds-m-left_small"></lightning-button>
             </div>
         </div>
     </lightning-card>
